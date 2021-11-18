@@ -6,6 +6,8 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 
+const log4js = require('./utils/log4j')
+
 const index = require('./routes/index')
 const users = require('./routes/users')
 
@@ -24,12 +26,17 @@ app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
 
+app.use(() => {
+  ctx.body = 'hello'
+})
+
 // logger
 app.use(async (ctx, next) => {
   const start = new Date()
   await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+  log4js.info('info is here')
+  // const ms = new Date() - start
+  // console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
 // routes
@@ -38,7 +45,8 @@ app.use(users.routes(), users.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
-  console.error('server error', err, ctx)
+  // console.error('server error', err, ctx)
+  log4js.error(`${err.stack}`)
 });
 
 module.exports = app
